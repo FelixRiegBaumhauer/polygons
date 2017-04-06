@@ -27,6 +27,9 @@ void add_polygon( struct matrix *polygons,
 		  double x0, double y0, double z0, 
 		  double x1, double y1, double z1, 
 		  double x2, double y2, double z2 ) {
+  add_point(polygons, x0, y0, z0);
+  add_point(polygons, x1, y1, z1);
+  add_point(polygons, x2, y2, z2);
 }
 
 /*======== void draw_polygons() ==========
@@ -67,6 +70,8 @@ void add_box( struct matrix * edges,
   z0 = z;
   z1 = z-depth;
 
+  add_polygon(edges, x0, y0, z0, x0, y1, z0, x1, y0, z0);
+  /*
   //front
   add_edge(edges, x0, y0, z0, x0+2, y0+2, z0+2);
   add_edge(edges, x1, y0, z0, x1+2, y0+2, z0+2);
@@ -78,6 +83,7 @@ void add_box( struct matrix * edges,
   add_edge(edges, x1, y0, z1, x1+2, y0+2, z1+2);
   add_edge(edges, x1, y1, z1, x1+2, y1+2, z1+2);
   add_edge(edges, x0, y1, z1, x0+2, y1+2, z1+2);
+  */
 }
 
 /*======== void add_sphere() ==========
@@ -384,7 +390,7 @@ to the screen
 void draw_lines( struct matrix * points, screen s, color c) {
 
  if ( points->lastcol < 2 ) {
-   printf("Need at least 2 points to draw a line!\n");
+   printf("Need at least 3 points to draw a line!\n");
    return;
  }
  
@@ -394,7 +400,22 @@ void draw_lines( struct matrix * points, screen s, color c) {
 	      points->m[1][point],
 	      points->m[0][point+1],
 	      points->m[1][point+1],
-	      s, c);	       
+	      s, c);
+
+ //
+ draw_line( points->m[0][point+1],
+	    points->m[1][point+1],
+	    points->m[0][point+2],
+	    points->m[1][point+2],
+	    s, c);
+
+ draw_line( points->m[0][point+2],
+	    points->m[1][point+2],
+	    points->m[0][point],
+	    points->m[1][point],
+	    s, c);
+
+ 
 }// end draw_lines
 
 
