@@ -42,6 +42,34 @@ lines connecting each points to create bounding
 triangles
 ====================*/
 void draw_polygons( struct matrix *polygons, screen s, color c ) {
+ 
+  if ( polygons->lastcol < 3 ) {
+    printf("Need at least 3 points to draw a triangle!\n");
+    return;
+  }
+  
+  int point;
+  for (point=0; point < polygons->lastcol-1; point+=3){
+    draw_line( polygons->m[0][point],
+	       polygons->m[1][point],
+	       polygons->m[0][point+1],
+	       polygons->m[1][point+1],
+	       s, c);
+    //
+    draw_line( polygons->m[0][point+1],
+	       polygons->m[1][point+1],
+	       polygons->m[0][point+2],
+	       polygons->m[1][point+2],
+	       s, c);
+    
+    draw_line( polygons->m[0][point+2],
+	       polygons->m[1][point+2],
+	       polygons->m[0][point],
+	       polygons->m[1][point],
+	       s, c);
+  }
+  
+  
 }
 
 
@@ -70,7 +98,42 @@ void add_box( struct matrix * edges,
   z0 = z;
   z1 = z-depth;
 
-  add_polygon(edges, x0, y0, z0, x0, y1, z0, x1, y0, z0);
+  
+  //front side
+  add_polygon(edges, x0, y0, z0, x1, y0, z0, x1, y1, z0);
+  add_polygon(edges, x0, y0, z0, x1, y1, z0, x0, y1, z0);
+  //add_polygon(edges, x0, y0, z0, x0, y1, z0, x1, y0, z0);
+  //add_polygon(edges, x0, y1, z0, x1, y1, z0, x1, y0, z0);
+  //back side
+  add_polygon(edges, x0, y0, z1, x1, y0, z1, x0, y1, z1);
+  add_polygon(edges, x1, y0, z1, x1, y1, z1, x0, y1, z1);
+  //add_polygon(edges, x0, y0, z1, x0, y1, z1, x1, y0, z1);
+  //add_polygon(edges, x0, y1, z1, x1, y1, z1, x1, y0, z1);
+
+  //top
+  add_polygon(edges, x0, y0, z0, x1, y0, z0, x1, y0, z1);
+  add_polygon(edges, x0, y0, z0, x1, y0, z1, x0, y0, z1);
+  //add_polygon(edges, x0, y0, z0, x1, y0, z0, x1, y0, z1);
+  //add_polygon(edges, x0, y0, z0, x0, y0, z1, x1, y0, z1);
+  //bottom
+  add_polygon(edges, x0, y1, z0, x0, y1, z1, x1, y1, z0);
+  add_polygon(edges, x1, y1, z0, x0, y1, z1, x1, y1, z1);
+  //add_polygon(edges, x0, y1, z0, x1, y1, z0, x1, y1, z1);
+  //add_polygon(edges, x0, y1, z0, x0, y1, z1, x1, y1, z1);
+  
+  
+  //left side
+  add_polygon(edges, x0, y0, z0, x0, y0, z1, x0, y1, z0);
+  add_polygon(edges, x0, y1, z0, x0, y0, z1, x0, y1, z1);
+  //add_polygon(edges, x0, y0, z0, x0, y1, z0, x0, y0, z1);
+  //add_polygon(edges, x0, y1, z0, x0, y1, z1, x0, y0, z1);
+  //right side
+  add_polygon(edges, x1, y0, z0, x1, y1, z1, x1, y0, z1);
+  add_polygon(edges, x1, y0, z0, x1, y1, z0, x1, y1, z1);
+  //add_polygon(edges, x1, y0, z0, x1, y1, z0, x1, y0, z1);
+  //add_polygon(edges, x1, y1, z0, x1, y1, z1, x1, y0, z1);
+
+
   /*
   //front
   add_edge(edges, x0, y0, z0, x0+2, y0+2, z0+2);
@@ -115,14 +178,77 @@ void add_sphere( struct matrix * edges,
   num_steps++;
   for ( lat = latStart; lat < latStop; lat++ ) {
     for ( longt = longStart; longt <= longStop; longt++ ) {
-
+      /*
+      if(lat*2 > latStop)
+	break;
+      */
+      
       index = lat * (num_steps) + longt;
+      /*
       add_edge( edges, points->m[0][index],
 		points->m[1][index],
 		points->m[2][index],
 		points->m[0][index] + 1,
 		points->m[1][index] + 1,
 		points->m[2][index] + 1);
+      */
+      if(lat+1 != latStop){
+	if(longt != longStop){
+	  
+	  //triangle 1
+	  add_polygon(edges,
+		      points->m[0][index],
+		      points->m[1][index],
+		      points->m[2][index],
+		      points->m[0][index+1],
+		      points->m[1][index+1],
+		      points->m[2][index+1],
+		      points->m[0][index+num_steps+1],
+		      points->m[1][index+num_steps+1],
+		      points->m[2][index+num_steps+1]);
+	  
+	  //triangle 2
+	  add_polygon(edges,
+		      points->m[0][index],
+		      points->m[1][index],
+		      points->m[2][index],
+		      points->m[0][index+num_steps+1],
+		      points->m[1][index+num_steps+1],
+		      points->m[2][index+num_steps+1],
+		      points->m[0][index+num_steps],
+		      points->m[1][index+num_steps],
+		      points->m[2][index+num_steps]);
+	}
+
+      }
+      else{
+	//stops a pesky triganle at the end
+	if(longt != longStop){
+	  	  //triangle 1
+	  add_polygon(edges,
+		      points->m[0][index],
+		      points->m[1][index],
+		      points->m[2][index],
+		      points->m[0][index+1],
+		      points->m[1][index+1],
+		      points->m[2][index+1],
+		      points->m[0][(index % num_steps) +1],
+		      points->m[1][(index % num_steps) +1],
+		      points->m[2][(index % num_steps) +1]);
+	  
+	  //triangle 2
+	  add_polygon(edges,
+		      points->m[0][index],
+		      points->m[1][index],
+		      points->m[2][index],
+		      points->m[0][(index % num_steps) +1],
+		      points->m[1][(index % num_steps) +1],
+		      points->m[2][(index % num_steps) +1],
+		      points->m[0][index % num_steps],
+		      points->m[1][index % num_steps],
+		      points->m[2][index % num_steps]);
+	}
+      }
     }
   }  
   free_matrix(points);
@@ -206,12 +332,177 @@ void add_torus( struct matrix * edges,
     for ( longt = longStart; longt < longStop; longt++ ) {
       
       index = lat * (num_steps) + longt;
+
+      /*
       add_edge( edges, points->m[0][index],
 		points->m[1][index],
 		points->m[2][index],
 		points->m[0][index] + 1,
 		points->m[1][index] + 1,
 		points->m[2][index] + 1);
+      */
+
+      /*
+      if(lat*2 < latStop)
+	break;
+      */
+
+      if( (index % num_steps) < 9){
+	//normal case
+	if(lat+1 != latStop){
+	  //triangle 1
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][index + 1],
+		       points->m[1][index + 1],
+		       points->m[2][index + 1],
+		       points->m[0][index + num_steps + 1],
+		       points->m[1][index + num_steps + 1],
+		       points->m[2][index + num_steps + 1]);
+	  
+	  //triangle 2
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][index + num_steps],
+		       points->m[1][index + num_steps],
+		       points->m[2][index + num_steps],
+		       points->m[0][index + num_steps + 1],
+		       points->m[1][index + num_steps + 1],
+		       points->m[2][index + num_steps + 1]);
+	  
+	}
+	else{
+	  //triangle 1
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][index + 1],
+		       points->m[1][index + 1],
+		       points->m[2][index + 1],
+		       points->m[0][(index % num_steps) + 1],
+		       points->m[1][(index % num_steps) + 1],
+		       points->m[2][(index % num_steps) + 1]);
+	  
+	  //triangle 2
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][(index % num_steps)],
+		       points->m[1][(index % num_steps)],
+		       points->m[2][(index % num_steps)],
+		       points->m[0][(index % num_steps) + 1],
+		       points->m[1][(index % num_steps) + 1],
+		       points->m[2][(index % num_steps) + 1]);
+	}
+      }
+      else{
+	
+	//testeroni
+	if(lat+1 != latStop){
+	  
+	  //triangle 1
+	  /*
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][index - num_steps + 1],//[index + 1],
+		       points->m[1][index - num_steps + 1],
+		       points->m[2][index - num_steps + 1],
+		       points->m[0][1],//[index + num_steps + 1],
+		       points->m[1][1],
+		       points->m[2][1]);
+	  */
+	  /*
+	  //triangle 2
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][index + num_steps],
+		       points->m[1][index + num_steps],
+		       points->m[2][index + num_steps],
+		       points->m[0][index + 1],
+		       points->m[1][index + 1],
+		       points->m[2][index + 1]);
+	  */
+	}
+	else{
+	  /*
+	  //triangle 1
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][num_steps],//[index + 1],
+		       points->m[1][num_steps],
+		       points->m[2][num_steps],
+		       points->m[0][1],//[(index % num_steps) + 1],
+		       points->m[1][1],
+		       points->m[2][1]);
+	  */
+	  /*
+	  //triangle 2
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][(index % num_steps)],
+		       points->m[1][(index % num_steps)],
+		       points->m[2][(index % num_steps)],
+		       points->m[0][(index % num_steps) + 1],
+		       points->m[1][(index % num_steps) + 1],
+		       points->m[2][(index % num_steps) + 1]);
+	  */
+	}
+      }
+      /*
+      if(lat+1 != latStop){
+	//triangle 1
+	add_polygon( edges, points->m[0][index],
+		     points->m[1][index],
+		     points->m[2][index],
+		     points->m[0][index + 1],
+		     points->m[1][index + 1],
+		     points->m[2][index + 1],
+		     points->m[0][index + num_steps + 1],
+		     points->m[1][index + num_steps + 1],
+		     points->m[2][index + num_steps + 1]);
+	
+	//triangle 2
+	add_polygon( edges, points->m[0][index],
+		     points->m[1][index],
+		     points->m[2][index],
+		     points->m[0][index + num_steps],
+		     points->m[1][index + num_steps],
+		     points->m[2][index + num_steps],
+		     points->m[0][index + num_steps + 1],
+		     points->m[1][index + num_steps + 1],
+		     points->m[2][index + num_steps + 1]);
+	
+      }
+      else{
+	//triangle 1
+	add_polygon( edges, points->m[0][index],
+		     points->m[1][index],
+		     points->m[2][index],
+		     points->m[0][index + 1],
+		     points->m[1][index + 1],
+		     points->m[2][index + 1],
+		     points->m[0][(index % num_steps) + 1],
+		     points->m[1][(index % num_steps) + 1],
+		     points->m[2][(index % num_steps) + 1]);
+	
+	//triangle 2
+	add_polygon( edges, points->m[0][index],
+		     points->m[1][index],
+		     points->m[2][index],
+		     points->m[0][(index % num_steps)],
+		     points->m[1][(index % num_steps)],
+		     points->m[2][(index % num_steps)],
+		     points->m[0][(index % num_steps) + 1],
+		     points->m[1][(index % num_steps) + 1],
+		     points->m[2][(index % num_steps) + 1]);
+      }
+      */
     }
   }  
   free_matrix(points);
@@ -390,7 +681,7 @@ to the screen
 void draw_lines( struct matrix * points, screen s, color c) {
 
  if ( points->lastcol < 2 ) {
-   printf("Need at least 3 points to draw a line!\n");
+   printf("Need at least 2 points to draw a line!\n");
    return;
  }
  
@@ -403,6 +694,7 @@ void draw_lines( struct matrix * points, screen s, color c) {
 	      s, c);
 
  //
+ /*
  draw_line( points->m[0][point+1],
 	    points->m[1][point+1],
 	    points->m[0][point+2],
@@ -415,7 +707,7 @@ void draw_lines( struct matrix * points, screen s, color c) {
 	    points->m[1][point],
 	    s, c);
 
- 
+ */
 }// end draw_lines
 
 

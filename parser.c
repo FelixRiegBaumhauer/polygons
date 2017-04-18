@@ -91,7 +91,7 @@ void parse_file ( char * filename,
     double theta;
     char axis;
     int type;
-    double step = 0.01;
+    double step = .1; //.1;//0.01;
 
     if ( strncmp(line, "box", strlen(line)) == 0 ) {
       fgets(line, sizeof(line), f);
@@ -227,7 +227,11 @@ void parse_file ( char * filename,
     else if ( strncmp(line, "display", strlen(line)) == 0 ) {
       //printf("DISPLAY\t%s", line);
       clear_screen(s);
-      draw_lines(edges, s, c);
+
+      //draw_lines(edges, s, c);
+      //HOT CODE
+      draw_polygons(edges, s, c);
+      //
       display( s );
     }//end display
 
