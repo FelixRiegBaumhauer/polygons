@@ -42,7 +42,8 @@ lines connecting each points to create bounding
 triangles
 ====================*/
 void draw_polygons( struct matrix *polygons, screen s, color c ) {
- 
+
+  
   if ( polygons->lastcol < 3 ) {
     printf("Need at least 3 points to draw a triangle!\n");
     return;
@@ -68,6 +69,7 @@ void draw_polygons( struct matrix *polygons, screen s, color c ) {
 	       polygons->m[1][point],
 	       s, c);
   }
+  
   
   
 }
@@ -333,178 +335,59 @@ void add_torus( struct matrix * edges,
       
       index = lat * (num_steps) + longt;
 
-      /*
-      add_edge( edges, points->m[0][index],
-		points->m[1][index],
-		points->m[2][index],
-		points->m[0][index] + 1,
-		points->m[1][index] + 1,
-		points->m[2][index] + 1);
-      */
-
-      /*
-      if(lat*2 < latStop)
-	break;
-      */
-
-      if( (index % num_steps) < 9){
-	//normal case
-	if(lat+1 != latStop){
-	  //triangle 1
+      //WRONG WAY (order)
+      if(index < num_steps * (num_steps -1)){
+	if( ((index % num_steps) +1) < num_steps){
 	  add_polygon( edges, points->m[0][index],
 		       points->m[1][index],
 		       points->m[2][index],
-		       points->m[0][index + 1],
-		       points->m[1][index + 1],
-		       points->m[2][index + 1],
 		       points->m[0][index + num_steps + 1],
 		       points->m[1][index + num_steps + 1],
-		       points->m[2][index + num_steps + 1]);
-	  
-	  //triangle 2
-	  add_polygon( edges, points->m[0][index],
-		       points->m[1][index],
-		       points->m[2][index],
-		       points->m[0][index + num_steps],
-		       points->m[1][index + num_steps],
-		       points->m[2][index + num_steps],
-		       points->m[0][index + num_steps + 1],
-		       points->m[1][index + num_steps + 1],
-		       points->m[2][index + num_steps + 1]);
-	  
-	}
-	else{
-	  //triangle 1
-	  add_polygon( edges, points->m[0][index],
-		       points->m[1][index],
-		       points->m[2][index],
-		       points->m[0][index + 1],
-		       points->m[1][index + 1],
-		       points->m[2][index + 1],
-		       points->m[0][(index % num_steps) + 1],
-		       points->m[1][(index % num_steps) + 1],
-		       points->m[2][(index % num_steps) + 1]);
-	  
-	  //triangle 2
-	  add_polygon( edges, points->m[0][index],
-		       points->m[1][index],
-		       points->m[2][index],
-		       points->m[0][(index % num_steps)],
-		       points->m[1][(index % num_steps)],
-		       points->m[2][(index % num_steps)],
-		       points->m[0][(index % num_steps) + 1],
-		       points->m[1][(index % num_steps) + 1],
-		       points->m[2][(index % num_steps) + 1]);
-	}
-      }
-      else{
-	
-	//testeroni
-	if(lat+1 != latStop){
-	  
-	  //triangle 1
-	  /*
-	  add_polygon( edges, points->m[0][index],
-		       points->m[1][index],
-		       points->m[2][index],
-		       points->m[0][index - num_steps + 1],//[index + 1],
-		       points->m[1][index - num_steps + 1],
-		       points->m[2][index - num_steps + 1],
-		       points->m[0][1],//[index + num_steps + 1],
-		       points->m[1][1],
-		       points->m[2][1]);
-	  */
-	  /*
-	  //triangle 2
-	  add_polygon( edges, points->m[0][index],
-		       points->m[1][index],
-		       points->m[2][index],
-		       points->m[0][index + num_steps],
-		       points->m[1][index + num_steps],
-		       points->m[2][index + num_steps],
+		       points->m[2][index + num_steps + 1],
 		       points->m[0][index + 1],
 		       points->m[1][index + 1],
 		       points->m[2][index + 1]);
-	  */
 	}
 	else{
-	  /*
-	  //triangle 1
 	  add_polygon( edges, points->m[0][index],
 		       points->m[1][index],
 		       points->m[2][index],
-		       points->m[0][num_steps],//[index + 1],
-		       points->m[1][num_steps],
-		       points->m[2][num_steps],
-		       points->m[0][1],//[(index % num_steps) + 1],
-		       points->m[1][1],
-		       points->m[2][1]);
-	  */
-	  /*
-	  //triangle 2
-	  add_polygon( edges, points->m[0][index],
-		       points->m[1][index],
-		       points->m[2][index],
-		       points->m[0][(index % num_steps)],
-		       points->m[1][(index % num_steps)],
-		       points->m[2][(index % num_steps)],
-		       points->m[0][(index % num_steps) + 1],
-		       points->m[1][(index % num_steps) + 1],
-		       points->m[2][(index % num_steps) + 1]);
-	  */
+		       points->m[0][index - num_steps + 1],
+		       points->m[1][index - num_steps + 1],
+		       points->m[2][index - num_steps + 1],
+		       points->m[0][index + 1],
+		       points->m[1][index + 1],
+		       points->m[2][index + 1]);
 	}
       }
-      /*
-      if(lat+1 != latStop){
-	//triangle 1
-	add_polygon( edges, points->m[0][index],
-		     points->m[1][index],
-		     points->m[2][index],
-		     points->m[0][index + 1],
-		     points->m[1][index + 1],
-		     points->m[2][index + 1],
-		     points->m[0][index + num_steps + 1],
-		     points->m[1][index + num_steps + 1],
-		     points->m[2][index + num_steps + 1]);
-	
-	//triangle 2
-	add_polygon( edges, points->m[0][index],
-		     points->m[1][index],
-		     points->m[2][index],
-		     points->m[0][index + num_steps],
-		     points->m[1][index + num_steps],
-		     points->m[2][index + num_steps],
-		     points->m[0][index + num_steps + 1],
-		     points->m[1][index + num_steps + 1],
-		     points->m[2][index + num_steps + 1]);
-	
-      }
       else{
-	//triangle 1
-	add_polygon( edges, points->m[0][index],
-		     points->m[1][index],
-		     points->m[2][index],
-		     points->m[0][index + 1],
-		     points->m[1][index + 1],
-		     points->m[2][index + 1],
-		     points->m[0][(index % num_steps) + 1],
-		     points->m[1][(index % num_steps) + 1],
-		     points->m[2][(index % num_steps) + 1]);
-	
-	//triangle 2
-	add_polygon( edges, points->m[0][index],
-		     points->m[1][index],
-		     points->m[2][index],
-		     points->m[0][(index % num_steps)],
-		     points->m[1][(index % num_steps)],
-		     points->m[2][(index % num_steps)],
-		     points->m[0][(index % num_steps) + 1],
-		     points->m[1][(index % num_steps) + 1],
-		     points->m[2][(index % num_steps) + 1]);
+	if( ((index % num_steps) +1) < num_steps){
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][index - (num_steps)*(num_steps-1) + 1],
+		       points->m[1][index - (num_steps)*(num_steps-1) + 1],
+		       points->m[2][index - (num_steps)*(num_steps-1) + 1],
+		       points->m[0][index + 1],
+		       points->m[1][index + 1],
+		       points->m[2][index + 1]);
+	}
+	else{
+	  add_polygon( edges, points->m[0][index],
+		       points->m[1][index],
+		       points->m[2][index],
+		       points->m[0][index - (num_steps)*(num_steps) + 1],
+		       points->m[1][index - (num_steps)*(num_steps) + 1],
+		       points->m[2][index - (num_steps)*(num_steps) + 1],
+		       points->m[0][index - num_steps + 1],
+		       points->m[1][index - num_steps + 1],
+		       points->m[2][index - num_steps + 1]);
+	}
       }
-      */
+      
     }
-  }  
+  }
+     
   free_matrix(points);
 }
 
